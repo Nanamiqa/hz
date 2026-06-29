@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Berkshire Signal Desk</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="股票选择">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">BS</div>
+          <div>
+            <h1>Berkshire Signal Desk</h1>
+            <p>价值纪律 + 每日信号</p>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>搜索</span>
+          <input id="stockSearch" type="search" placeholder="代码 / 名称 / 行业" autocomplete="off" />
+        </label>
+
+        <div class="segmented" role="group" aria-label="市场筛选">
+          <button class="is-active" type="button" data-market="all">全部</button>
+          <button type="button" data-market="CN">A 股</button>
+          <button type="button" data-market="HK">港股</button>
+          <button type="button" data-market="US">美股</button>
+        </div>
+
+        <div class="mode-block">
+          <span>研究框架</span>
+          <div class="segmented mode" role="group" aria-label="研究框架">
+            <button class="is-active" type="button" data-framework="hybrid">综合</button>
+            <button type="button" data-framework="value">价值</button>
+            <button type="button" data-framework="signal">信号</button>
+          </div>
+        </div>
+
+        <div class="toolbar three">
+          <button id="selectCore" class="icon-button" type="button" title="选择核心样本">
+            <span aria-hidden="true">◎</span>
+            <span>核心</span>
+          </button>
+          <button id="selectValue" class="icon-button" type="button" title="选择价值候选">
+            <span aria-hidden="true">◇</span>
+            <span>价值</span>
+          </button>
+          <button id="clearSelection" class="icon-button" type="button" title="清空选择">
+            <span aria-hidden="true">×</span>
+            <span>清空</span>
+          </button>
+        </div>
+
+        <div id="stockList" class="stock-list" aria-label="股票列表"></div>
+
+        <form id="customStockForm" class="custom-stock" autocomplete="off">
+          <div class="form-grid">
+            <label class="field compact">
+              <span>代码</span>
+              <input id="customSymbol" placeholder="例如 600519" />
+            </label>
+            <label class="field compact">
+              <span>名称</span>
+              <input id="customName" placeholder="自定义股票" />
+            </label>
+          </div>
+          <button class="primary full" type="submit">添加自定义</button>
+        </form>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <h2>投资研究台</h2>
+            <p id="asOfLabel"></p>
+          </div>
+          <div class="actions">
+            <label class="switch">
+              <input id="riskToggle" type="checkbox" />
+              <span>稳健闸门</span>
+            </label>
+            <button id="exportJson" class="secondary" type="button">导出 JSON</button>
+          </div>
+        </header>
+
+        <section class="notice-band" aria-label="使用提示">
+          <strong>静态研究参考</strong>
+          <span>页面不读取实时行情，不保存任何 API Key；适合做观察池、横向比较和买前纪律检查。</span>
+        </section>
+
+        <section class="metrics-band" aria-label="组合概览">
+          <div class="metric">
+            <span>已选</span>
+            <strong id="selectedCount">0</strong>
+          </div>
+          <div class="metric">
+            <span>伯克希尔分</span>
+            <strong id="berkshireScore">--</strong>
+          </div>
+          <div class="metric">
+            <span>安全边际</span>
+            <strong id="marginScore">--</strong>
+          </div>
+          <div class="metric">
+            <span>技术动量</span>
+            <strong id="avgMomentum">--</strong>
+          </div>
+          <div class="metric">
+            <span>风险闸门</span>
+            <strong id="riskGate">--</strong>
+          </div>
+          <div class="metric">
+            <span>研究动作</span>
+            <strong id="portfolioBias">--</strong>
+          </div>
+        </section>
+
+        <section class="analysis-grid">
+          <div class="panel chart-panel">
+            <div class="panel-heading">
+              <div>
+                <h3>组合图谱</h3>
+                <p>价值纪律、质量、动量和风险的综合视图</p>
+              </div>
+              <select id="focusMetric" aria-label="图表维度">
+                <option value="radar">价值雷达</option>
+                <option value="masters">四师视角</option>
+                <option value="trend">信号趋势</option>
+              </select>
+            </div>
+            <canvas id="analysisCanvas" width="900" height="480" aria-label="组合图表"></canvas>
+          </div>
+
+          <div class="panel playbook">
+            <div class="panel-heading">
+              <div>
+                <h3>研究动作</h3>
+                <p>先排雷，再谈机会</p>
+              </div>
+            </div>
+            <ol id="playbookList" class="playbook-list"></ol>
+          </div>
+        </section>
+
+        <section class="lens-grid" aria-label="四大师视角">
+          <article class="lens-card" data-lens="dyp">
+            <span>段永平</span>
+            <strong id="dypScore">--</strong>
+            <p id="dypNote">选择股票后评估生意本质。</p>
+          </article>
+          <article class="lens-card" data-lens="buffett">
+            <span>巴菲特</span>
+            <strong id="buffettScore">--</strong>
+            <p id="buffettNote">选择股票后评估护城河和价格。</p>
+          </article>
+          <article class="lens-card" data-lens="munger">
+            <span>芒格</span>
+            <strong id="mungerScore">--</strong>
+            <p id="mungerNote">选择股票后进行逆向排雷。</p>
+          </article>
+          <article class="lens-card" data-lens="lilu">
+            <span>李录</span>
+            <strong id="liluScore">--</strong>
+            <p id="liluNote">选择股票后评估长期确定性。</p>
+          </article>
+        </section>
+
+        <section class="decision-grid">
+          <div class="panel">
+            <div class="panel-heading">
+              <div>
+                <h3>买前 Checklist</h3>
+                <p>六关快速筛选</p>
+              </div>
+            </div>
+            <div id="checklistList" class="checklist-list"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-heading">
+              <div>
+                <h3>策略分层</h3>
+                <p>把观点翻译成研究节奏</p>
+              </div>
+            </div>
+            <div id="strategyTable" class="strategy-table"></div>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-heading">
+            <h3>单股研究卡</h3>
+            <span id="cardSummary">未选择</span>
+          </div>
+          <div id="analysisCards" class="cards"></div>
+        </section>
+      </main>
+    </div>
+
+    <template id="stockRowTemplate">
+      <label class="stock-row">
+        <input type="checkbox" />
+        <span class="stock-main">
+          <strong></strong>
+          <small></small>
+        </span>
+        <span class="stock-chip"></span>
+      </label>
+    </template>
+
+    <template id="analysisCardTemplate">
+      <article class="analysis-card">
+        <div class="card-title">
+          <div>
+            <h4></h4>
+            <p></p>
+          </div>
+          <span></span>
+        </div>
+        <div class="score-row four">
+          <div>
+            <span>价值</span>
+            <strong data-score="berkshire"></strong>
+          </div>
+          <div>
+            <span>边际</span>
+            <strong data-score="margin"></strong>
+          </div>
+          <div>
+            <span>动量</span>
+            <strong data-score="momentum"></strong>
+          </div>
+          <div>
+            <span>风险</span>
+            <strong data-score="risk"></strong>
+          </div>
+        </div>
+        <div class="mini-checks"></div>
+        <ul class="notes"></ul>
+      </article>
+    </template>
+
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>
