@@ -17,6 +17,7 @@
 - 价值雷达、四师视角、信号趋势图
 - 买前 Checklist
 - 策略分层和单股研究卡
+- 优先读取 `reports/latest.json` 大模型报告
 - JSON 导出
 
 ## 本地打开
@@ -44,11 +45,71 @@ http://127.0.0.1:8080
 5. 分支选择 `main`，目录选择 `/root`。
 6. 保存后等待 GitHub 生成 Pages 地址。
 
+## 大模型报告
+
+页面会优先读取：
+
+```text
+reports/latest.json
+```
+
+如果该文件存在，页面会用其中的模型论点、分数、Checklist、策略和单股 notes。读取失败时，页面会自动退回浏览器本地规则评分。
+
+本地生成报告：
+
+```bash
+OPENAI_API_KEY=你的key node scripts/generate-report.mjs
+```
+
+指定股票：
+
+```bash
+STOCK_LIST=BRK.B,AAPL,MSFT,00700,600519 OPENAI_API_KEY=你的key node scripts/generate-report.mjs
+```
+
+如果没有 `OPENAI_API_KEY`，脚本会生成 fallback 报告，用来验证页面通道。
+
+## GitHub Actions
+
+仓库包含 `.github/workflows/generate-report.yml`，支持手动运行和工作日定时运行。
+
+需要在 GitHub 仓库里配置：
+
+- `Settings -> Secrets and variables -> Actions -> Secrets`
+- 添加 `OPENAI_API_KEY`
+- 可选添加 `OPENAI_BASE_URL`
+- 可选在 `Variables` 添加 `OPENAI_MODEL` 和 `STOCK_LIST`
+
+Actions 会生成并提交 `reports/latest.json`，GitHub Pages 会读取这个静态 JSON。
+
+## 本地 skill 仓库
+
+本地可以把外部 skill 仓库放在：
+
+```text
+vendor/
+```
+
+当前建议结构：
+
+```text
+vendor/daily_stock_analysis/
+vendor/ai-berkshire/
+```
+
+`vendor/` 已加入 `.gitignore`，只作为本机对话和脚本参考，不推送到 GitHub Pages 仓库。
+
+你可以在 Codex 对话里说：
+
+```text
+参考 vendor/daily_stock_analysis/SKILL.md 和 vendor/ai-berkshire/codex-skills/investment-research/SKILL.md，分析我的观察池并更新 reports/latest.json
+```
+
 ## 重要边界
 
 GitHub Pages 只能托管静态文件，不能安全运行 Python 分析服务，也不能把模型 API Key、搜索 API Key 或券商/行情 Key 放到前端。
 
-因此这个页面是一个本地研究面板：评分由浏览器本地生成，不包含实时行情，不构成投资建议。
+因此大模型调用应发生在本地、Codex 对话、GitHub Actions 或后端代理里；浏览器只读取生成后的静态 JSON。
 
 后续升级路线：
 

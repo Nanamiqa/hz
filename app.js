@@ -265,6 +265,8 @@ const state = {
   conservative: localStorage.getItem("riskMode") === "conservative",
   framework: localStorage.getItem("frameworkMode") || "hybrid",
   chartMode: "radar",
+  modelReport: null,
+  reportState: "loading",
 };
 
 const el = {
@@ -292,6 +294,7 @@ const el = {
   analysisCards: document.querySelector("#analysisCards"),
   cardSummary: document.querySelector("#cardSummary"),
   exportJson: document.querySelector("#exportJson"),
+  reportStatus: document.querySelector("#reportStatus"),
   checklistList: document.querySelector("#checklistList"),
   strategyTable: document.querySelector("#strategyTable"),
   dypScore: document.querySelector("#dypScore"),
@@ -414,6 +417,62 @@ el.exportJson.addEventListener("click", () => {
 window.addEventListener("resize", drawChart);
 
 render();
+loadModelReport();
+
+async function loadModelReport() {
+  try {
+    const response = await fetch("./reports/latest.json", { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    state.modelReport = await response.json();
+    if (state.modelReport?.source === "sample") {
+      state.reportState = "sample";
+    } else if (state.modelReport?.source === "fallback") {
+      state.reportState = "generated-fallback";
+    } else {
+      state.reportState = "loaded";
+    }
+  } catch (error) {
+    state.modelReport = null;
+    state.reportState = "fallback";
+  }
+
+  updateReportStatus();
+  renderAnalysis();
+}
+
+function updateReportStatus() {
+  if (!el.reportStatus) return;
+  if (state.reportState === "loaded") {
+    const generatedAt = state.modelReport?.generatedAt ? formatReportTime(state.modelReport.generatedAt) : "未知时间";
+    el.reportStatus.textContent = `模型报告：已加载 / ${generatedAt}`;
+    return;
+  }
+  if (state.reportState === "sample") {
+    el.reportStatus.textContent = "模型报告：示例数据";
+    return;
+  }
+  if (state.reportState === "generated-fallback") {
+    const generatedAt = state.modelReport?.generatedAt ? formatReportTime(state.modelReport.generatedAt) : "未知时间";
+    el.reportStatus.textContent = `模型报告：fallback / ${generatedAt}`;
+    return;
+  }
+  if (state.reportState === "fallback") {
+    el.reportStatus.textContent = "模型报告：未加载，使用本地规则";
+    return;
+  }
+  el.reportStatus.textContent = "模型报告：加载中";
+}
+
+function formatReportTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("zh-CN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
 
 function setActiveFramework() {
   document.querySelectorAll("[data-framework]").forEach((item) => {
@@ -513,8 +572,34 @@ function getSelectedAnalyses() {
     .filter((stock) => state.selected.has(stock.symbol))
     .map((stock) => ({
       ...stock,
-      scores: scoreStock(stock),
+      scores: mergeModelScores(scoreStock(stock), findReportItem(stock.symbol)),
+      model: findReportItem(stock.symbol),
     }));
+}
+
+function findReportItem(symbol) {
+  const items = Array.isArray(state.modelReport?.selected) ? state.modelReport.selected : [];
+  return items.find((item) => normalizeSymbol(item.symbol || "") === normalizeSymbol(symbol));
+}
+
+function mergeModelScores(localScores, reportItem) {
+  const modelScores = reportItem?.modelScores || reportItem?.scores;
+  if (!modelScores) return localScores;
+  const merged = { ...localScores };
+  Object.entries(modelScores).forEach(([key, value]) => {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      merged[key] = clamp(value);
+    }
+  });
+  merged.masters = {
+    ...localScores.masters,
+    ...(modelScores.masters || {}),
+  };
+  merged.berkshire = merged.berkshire ?? localScores.berkshire;
+  merged.margin = merged.margin ?? localScores.margin;
+  merged.risk = merged.risk ?? localScores.risk;
+  merged.momentum = merged.momentum ?? localScores.momentum;
+  return merged;
 }
 
 function scoreStock(stock) {
@@ -661,6 +746,10 @@ function renderPlaybook(analyses) {
 }
 
 function buildPlaybook(analyses) {
+  if (Array.isArray(state.modelReport?.playbook) && state.modelReport.playbook.length > 0) {
+    return state.modelReport.playbook;
+  }
+
   if (!analyses.length) {
     return [
       "选择股票后生成研究动作。",
@@ -757,6 +846,14 @@ function renderChecklist(analyses) {
 }
 
 function buildChecklist(analyses) {
+  if (Array.isArray(state.modelReport?.checklist) && state.modelReport.checklist.length > 0) {
+    return state.modelReport.checklist.map((item) => ({
+      title: item.title || "模型检查项",
+      detail: item.detail || item.description || "等待补充说明。",
+      status: normalizeStatus(item.status),
+    }));
+  }
+
   if (!analyses.length) {
     return [
       { title: "能力圈", detail: "选股后检查是否看得懂。", status: "warn" },
@@ -818,6 +915,12 @@ function statusLow(value, pass, warn) {
   return "fail";
 }
 
+function normalizeStatus(value) {
+  if (value === "pass" || value === "ok" || value === "通过") return "pass";
+  if (value === "fail" || value === "bad" || value === "不通过") return "fail";
+  return "warn";
+}
+
 function renderStrategy(analyses) {
   const rows = buildStrategyRows(analyses);
   el.strategyTable.replaceChildren(
@@ -839,6 +942,14 @@ function renderStrategy(analyses) {
 }
 
 function buildStrategyRows(analyses) {
+  if (Array.isArray(state.modelReport?.strategy) && state.modelReport.strategy.length > 0) {
+    return state.modelReport.strategy.map((item) => ({
+      title: item.title || "模型策略",
+      detail: item.detail || item.description || "等待补充说明。",
+      tag: item.tag || "模型",
+    }));
+  }
+
   if (!analyses.length) {
     return [
       { title: "价值候选", detail: "选择股票后生成候选名单。", tag: "等待" },
@@ -895,7 +1006,7 @@ function renderCards(analyses) {
       const card = el.analysisCardTemplate.content.cloneNode(true);
       card.querySelector("h4").textContent = `${item.symbol} · ${item.name}`;
       card.querySelector("p").textContent = `${marketNames[item.market]} / ${item.sector} / ${frameworkName()}`;
-      card.querySelector(".card-title > span").textContent = actionLabel(rankScore(item));
+      card.querySelector(".card-title > span").textContent = item.model?.action || actionLabel(rankScore(item));
       card.querySelector('[data-score="berkshire"]').textContent = item.scores.berkshire;
       card.querySelector('[data-score="margin"]').textContent = item.scores.margin;
       card.querySelector('[data-score="momentum"]').textContent = item.scores.momentum;
@@ -931,6 +1042,21 @@ function createMiniChecks(item) {
 }
 
 function createNotes(item) {
+  if (item.model) {
+    const modelNotes = [];
+    if (item.model.thesis) {
+      modelNotes.push(`模型论点：${item.model.thesis}`);
+    }
+    if (Array.isArray(item.model.notes)) {
+      modelNotes.push(...item.model.notes);
+    }
+    if (item.model.risks) {
+      const risks = Array.isArray(item.model.risks) ? item.model.risks.join("；") : item.model.risks;
+      modelNotes.push(`主要风险：${risks}`);
+    }
+    if (modelNotes.length > 0) return modelNotes.slice(0, 5);
+  }
+
   const notes = [];
   const { valuation, quality, momentum, risk, catalyst, berkshire, margin, business, moat, cashflow, predictability, information } = item.scores;
 

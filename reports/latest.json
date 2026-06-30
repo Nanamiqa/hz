@@ -1,0 +1,187 @@
+{
+  "version": "1",
+  "source": "fallback",
+  "generatedAt": "2026-06-30T12:24:30.633Z",
+  "model": "none",
+  "notice": "未配置模型 Key，当前为 fallback 报告，不构成投资建议。",
+  "summary": {
+    "title": "Fallback 报告",
+    "stance": "等待模型运行",
+    "brief": "脚本已可运行。配置 OPENAI_API_KEY 后会调用大模型生成 reports/latest.json。"
+  },
+  "playbook": [
+    "配置 OPENAI_API_KEY 后重新运行脚本。",
+    "正式研究前补充最新价格、财报、公告和行业数据。"
+  ],
+  "checklist": [
+    {
+      "title": "模型调用",
+      "status": "warn",
+      "detail": "未配置 OPENAI_API_KEY。"
+    },
+    {
+      "title": "数据完整度",
+      "status": "warn",
+      "detail": "当前未接入实时行情和财务数据。"
+    }
+  ],
+  "strategy": [
+    {
+      "title": "下一步",
+      "detail": "配置 GitHub Secrets 或本地环境变量。",
+      "tag": "配置"
+    }
+  ],
+  "selected": [
+    {
+      "symbol": "BRK.B",
+      "name": "Berkshire Hathaway",
+      "market": "US",
+      "sector": "控股",
+      "action": "待模型分析",
+      "thesis": "未配置 OPENAI_API_KEY，当前为脚本 fallback 报告。",
+      "modelScores": {
+        "berkshire": 55,
+        "margin": 50,
+        "momentum": 50,
+        "risk": 55,
+        "business": 55,
+        "moat": 50,
+        "cashflow": 55,
+        "predictability": 50
+      },
+      "masterViews": {
+        "dyp": "先确认自己是否看懂这门生意。",
+        "buffett": "等待护城河、现金流和价格数据。",
+        "munger": "先列出可能亏钱的路径。",
+        "lilu": "等待长期确定性的证据。"
+      },
+      "notes": [
+        "这是 fallback 报告。配置 OPENAI_API_KEY 后会生成真实模型分析。"
+      ],
+      "risks": [
+        "缺少实时行情、财报和新闻数据。"
+      ]
+    },
+    {
+      "symbol": "AAPL",
+      "name": "Apple",
+      "market": "US",
+      "sector": "科技",
+      "action": "待模型分析",
+      "thesis": "未配置 OPENAI_API_KEY，当前为脚本 fallback 报告。",
+      "modelScores": {
+        "berkshire": 55,
+        "margin": 50,
+        "momentum": 50,
+        "risk": 55,
+        "business": 55,
+        "moat": 50,
+        "cashflow": 55,
+        "predictability": 50
+      },
+      "masterViews": {
+        "dyp": "先确认自己是否看懂这门生意。",
+        "buffett": "等待护城河、现金流和价格数据。",
+        "munger": "先列出可能亏钱的路径。",
+        "lilu": "等待长期确定性的证据。"
+      },
+      "notes": [
+        "这是 fallback 报告。配置 OPENAI_API_KEY 后会生成真实模型分析。"
+      ],
+      "risks": [
+        "缺少实时行情、财报和新闻数据。"
+      ]
+    },
+    {
+      "symbol": "MSFT",
+      "name": "Microsoft",
+      "market": "US",
+      "sector": "软件",
+      "action": "待模型分析",
+      "thesis": "未配置 OPENAI_API_KEY，当前为脚本 fallback 报告。",
+      "modelScores": {
+        "berkshire": 55,
+        "margin": 50,
+        "momentum": 50,
+        "risk": 55,
+        "business": 55,
+        "moat": 50,
+        "cashflow": 55,
+        "predictability": 50
+      },
+      "masterViews": {
+        "dyp": "先确认自己是否看懂这门生意。",
+        "buffett": "等待护城河、现金流和价格数据。",
+        "munger": "先列出可能亏钱的路径。",
+        "lilu": "等待长期确定性的证据。"
+      },
+      "notes": [
+        "这是 fallback 报告。配置 OPENAI_API_KEY 后会生成真实模型分析。"
+      ],
+      "risks": [
+        "缺少实时行情、财报和新闻数据。"
+      ]
+    },
+    {
+      "symbol": "00700",
+      "name": "腾讯控股",
+      "market": "HK",
+      "sector": "互联网",
+      "action": "待模型分析",
+      "thesis": "未配置 OPENAI_API_KEY，当前为脚本 fallback 报告。",
+      "modelScores": {
+        "berkshire": 55,
+        "margin": 50,
+        "momentum": 50,
+        "risk": 55,
+        "business": 55,
+        "moat": 50,
+        "cashflow": 55,
+        "predictability": 50
+      },
+      "masterViews": {
+        "dyp": "先确认自己是否看懂这门生意。",
+        "buffett": "等待护城河、现金流和价格数据。",
+        "munger": "先列出可能亏钱的路径。",
+        "lilu": "等待长期确定性的证据。"
+      },
+      "notes": [
+        "这是 fallback 报告。配置 OPENAI_API_KEY 后会生成真实模型分析。"
+      ],
+      "risks": [
+        "缺少实时行情、财报和新闻数据。"
+      ]
+    },
+    {
+      "symbol": "600519",
+      "name": "贵州茅台",
+      "market": "CN",
+      "sector": "消费",
+      "action": "待模型分析",
+      "thesis": "未配置 OPENAI_API_KEY，当前为脚本 fallback 报告。",
+      "modelScores": {
+        "berkshire": 55,
+        "margin": 50,
+        "momentum": 50,
+        "risk": 55,
+        "business": 55,
+        "moat": 50,
+        "cashflow": 55,
+        "predictability": 50
+      },
+      "masterViews": {
+        "dyp": "先确认自己是否看懂这门生意。",
+        "buffett": "等待护城河、现金流和价格数据。",
+        "munger": "先列出可能亏钱的路径。",
+        "lilu": "等待长期确定性的证据。"
+      },
+      "notes": [
+        "这是 fallback 报告。配置 OPENAI_API_KEY 后会生成真实模型分析。"
+      ],
+      "risks": [
+        "缺少实时行情、财报和新闻数据。"
+      ]
+    }
+  ]
+}

@@ -359,6 +359,17 @@ button {
   white-space: nowrap;
 }
 
+#reportStatus {
+  margin-left: auto;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(180, 83, 9, 0.12);
+  color: #78350f;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .metrics-band {
   display: grid;
   grid-template-columns: repeat(6, minmax(120px, 1fr));
@@ -744,6 +755,11 @@ button {
   .notice-band {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  #reportStatus {
+    margin-left: 0;
+    text-align: center;
   }
 
   .actions {

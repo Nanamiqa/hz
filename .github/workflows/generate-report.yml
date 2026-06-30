@@ -1,0 +1,40 @@
+name: Generate LLM Stock Report
+
+on:
+  workflow_dispatch:
+    inputs:
+      stock_list:
+        description: "Comma-separated stock symbols"
+        required: false
+        default: "BRK.B,AAPL,MSFT,00700,600519"
+  schedule:
+    - cron: "0 10 * * 1-5"
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate report
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4.1-mini' }}
+          STOCK_LIST: ${{ github.event.inputs.stock_list || vars.STOCK_LIST || 'BRK.B,AAPL,MSFT,00700,600519' }}
+        run: node scripts/generate-report.mjs
+
+      - name: Commit report
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update LLM stock report"
+          file_pattern: reports/latest.json
