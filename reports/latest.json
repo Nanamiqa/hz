@@ -1,7 +1,7 @@
 {
   "version": "1",
   "source": "fallback",
-  "generatedAt": "2026-06-30T12:24:30.633Z",
+  "generatedAt": "2026-07-01T12:31:56.549Z",
   "model": "none",
   "notice": "未配置模型 Key，当前为 fallback 报告，不构成投资建议。",
   "summary": {
@@ -35,9 +35,9 @@
   "selected": [
     {
       "symbol": "BRK.B",
-      "name": "Berkshire Hathaway",
+      "name": "BRK.B",
       "market": "US",
-      "sector": "控股",
+      "sector": "待识别",
       "action": "待模型分析",
       "thesis": "未配置 OPENAI_API_KEY，当前为脚本 fallback 报告。",
       "modelScores": {
@@ -65,9 +65,9 @@
     },
     {
       "symbol": "AAPL",
-      "name": "Apple",
+      "name": "AAPL",
       "market": "US",
-      "sector": "科技",
+      "sector": "待识别",
       "action": "待模型分析",
       "thesis": "未配置 OPENAI_API_KEY，当前为脚本 fallback 报告。",
       "modelScores": {
@@ -95,9 +95,9 @@
     },
     {
       "symbol": "MSFT",
-      "name": "Microsoft",
+      "name": "MSFT",
       "market": "US",
-      "sector": "软件",
+      "sector": "待识别",
       "action": "待模型分析",
       "thesis": "未配置 OPENAI_API_KEY，当前为脚本 fallback 报告。",
       "modelScores": {
@@ -125,9 +125,9 @@
     },
     {
       "symbol": "00700",
-      "name": "腾讯控股",
+      "name": "00700",
       "market": "HK",
-      "sector": "互联网",
+      "sector": "待识别",
       "action": "待模型分析",
       "thesis": "未配置 OPENAI_API_KEY，当前为脚本 fallback 报告。",
       "modelScores": {
@@ -155,9 +155,9 @@
     },
     {
       "symbol": "600519",
-      "name": "贵州茅台",
+      "name": "600519",
       "market": "CN",
-      "sector": "消费",
+      "sector": "待识别",
       "action": "待模型分析",
       "thesis": "未配置 OPENAI_API_KEY，当前为脚本 fallback 报告。",
       "modelScores": {
